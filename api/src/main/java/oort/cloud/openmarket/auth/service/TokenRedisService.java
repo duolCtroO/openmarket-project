@@ -53,11 +53,16 @@ public class TokenRedisService implements TokenService{
         Duration accessDuration = Duration.ofMinutes(properties.accessTokenExpiredMinutes());
 
         String accessToken = jwtManager.getAccessToken(user, accessDuration);
-        String refreshToken = jwtManager.getRefreshToken(user, refreshDuration);
+        String refreshToken = getOrCreateRefreshToken(user, refreshDuration);
 
         refreshTokenRedisRepository.createOrUpdate(user.getUserId(), refreshToken, refreshDuration);
 
         return AuthToken.of(accessToken, refreshToken);
+    }
+
+    private String getOrCreateRefreshToken(UserDto user, Duration refreshDuration) {
+        return refreshTokenRedisRepository.read(user.getUserId())
+                .orElseGet(() -> jwtManager.getRefreshToken(user, refreshDuration));
     }
 
     @Override

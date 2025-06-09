@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: openmarket-mysql-db2
+    ports:
+      - "13306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: admin@123
+      MYSQL_DATABASE: openmarket
+    volumes:
+      - ./db/init:/docker-entrypoint-initdb.d
+    networks:
+      - openmarket-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:latest
+    container_name: openmarket-redis2
+    ports:
+      - "6380:6379"
+    networks:
+      - openmarket-net
+
+  web:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    container_name: openmarket-web2
+    depends_on:
+      - mysql
+      - redis
+    entrypoint: ["/bin/sh", "-c", "until mysqladmin ping -h mysql --silent; do echo waiting for mysql; sleep 2; done; java -jar app.jar"]
+    ports:
+      - "8080:8080"
+    networks:
+      - openmarket-net
+
+networks:
+  openmarket-net:
+
+
+# docker-compose down -v
+# docker-compose up --build -d
