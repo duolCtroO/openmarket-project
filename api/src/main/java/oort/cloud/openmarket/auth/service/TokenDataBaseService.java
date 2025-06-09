@@ -58,23 +58,18 @@ public class TokenDataBaseService implements TokenService {
         Duration accessDuration = Duration.ofMinutes(properties.accessTokenExpiredMinutes());
 
         String accessToken = jwtManager.getAccessToken(user, accessDuration);
-        String refreshToken = jwtManager.getRefreshToken(user, refreshDuration);
 
-        RefreshToken saveRefreshToken = refreshTokenRepository.findByUserId(user.getUserId())
-                .map(exist -> {
-                    exist.setToken(refreshToken);
-                    exist.setExpiredAt(LocalDateTime.now().plus(refreshDuration));
-                    return exist;
-                })
+        RefreshToken refreshToken = refreshTokenRepository.findByUserId(user.getUserId())
                 .orElseGet(() ->
                         RefreshToken.createRefreshToken(
                                 user.getUserId(),
-                                refreshToken,
+                                jwtManager.getRefreshToken(user, refreshDuration),
                                 LocalDateTime.now().plus(refreshDuration)
                         )
                 );
-        refreshTokenRepository.save(saveRefreshToken);
-        return AuthToken.of(accessToken, refreshToken);
+        refreshTokenRepository.save(refreshToken);
+
+        return AuthToken.of(accessToken, refreshToken.getToken());
     }
 
     @Override
