@@ -4,7 +4,7 @@ spring:
   application:
     name: settlement
   datasource:
-    url: jdbc:mysql://localhost:13306/openmarket
+    url: jdbc:mysql://localhost:13306/openmarket?rewriteBatchedStatements=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: admin@123
@@ -19,4 +19,11 @@ spring:
 logging:
   level:
     org.springframework.batch.item.database: DEBUG
+
+mybatis:
+  mapper-locations: classpath:/mappers/**/*.xml
+  type-aliases-package: oort.cloud.settlement.batch.data
+  configuration:
+    map-underscore-to-camel-case: true
+
 
