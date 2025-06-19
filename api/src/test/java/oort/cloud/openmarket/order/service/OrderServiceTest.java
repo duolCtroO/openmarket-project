@@ -82,11 +82,12 @@ class OrderServiceTest {
                 new OrderItemCreateRequestTest(200L, 1));
         OrderCreateRequestTest orderReq = new OrderCreateRequestTest(
                 orderItems,10L, "test", "12312341234");
+        List<Long> ids = orderItems.stream().map(OrderItemCreateRequest::getProductId).toList();
 
         //when
         when(userService.findUserEntityById(1L)).thenReturn(mockUser);
         when(mockUser.findAddress(10L)).thenReturn(mockAddress);
-        when(productsService.getProductListByIds(orderItems)).thenReturn(List.of(product1, product2));
+        when(productsService.getProductListByIds(ids)).thenReturn(List.of(product1, product2));
         when(orderRepository.save(any(Order.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -111,11 +112,12 @@ class OrderServiceTest {
                 new OrderItemCreateRequestTest(200L, 12));
         OrderCreateRequestTest orderReq = new OrderCreateRequestTest(
                 orderItems, 10L, "test", "12312341234");
+        List<Long> ids = orderItems.stream().map(OrderItemCreateRequest::getProductId).toList();
 
         //when
         when(userService.findUserEntityById(1L)).thenReturn(mockUser);
         when(mockUser.findAddress(10L)).thenReturn(mockAddress);
-        when(productsService.getProductListByIds(orderItems)).thenReturn(List.of(product1, product2));
+        when(productsService.getProductListByIds(ids)).thenReturn(List.of(product1, product2));
 
         assertThrows(OutOfStockException.class, () -> orderService.createOrder(1L, orderReq));
     }
@@ -128,11 +130,12 @@ class OrderServiceTest {
                 new OrderItemCreateRequestTest(200L, 1));
         OrderCreateRequestTest orderReq = new OrderCreateRequestTest(
                 orderItems, 10L, "test", "12312341234");
+        List<Long> ids = orderItems.stream().map(OrderItemCreateRequest::getProductId).toList();
 
         //when
         when(userService.findUserEntityById(1L)).thenReturn(mockUser);
         when(mockUser.findAddress(10L)).thenReturn(mockAddress);
-        when(productsService.getProductListByIds(orderItems)).thenReturn(List.of(product1, product2));
+        when(productsService.getProductListByIds(ids)).thenReturn(List.of(product1, product2));
         when(orderRepository.save(any(Order.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -163,17 +166,17 @@ class OrderServiceTest {
         int expectProduct1Stock = product1Stock - product1OrderQuantity;
         int expectProduct2Stock = product2Stock - product2OrderQuantity;
 
-
         List<OrderItemCreateRequest> orderItems = List.of(
                 new OrderItemCreateRequestTest(100L, product1OrderQuantity),
                 new OrderItemCreateRequestTest(200L, product2OrderQuantity));
         OrderCreateRequestTest orderReq = new OrderCreateRequestTest(
                 orderItems,10L, "test", "12312341234");
+        List<Long> ids = orderItems.stream().map(OrderItemCreateRequest::getProductId).toList();
 
         //when
         when(userService.findUserEntityById(1L)).thenReturn(mockUser);
         when(mockUser.findAddress(10L)).thenReturn(mockAddress);
-        when(productsService.getProductListByIds(orderItems)).thenReturn(List.of(product1, product2));
+        when(productsService.getProductListByIds(ids)).thenReturn(List.of(product1, product2));
         when(orderRepository.save(any(Order.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -248,6 +251,5 @@ class OrderServiceTest {
 
         verify(paymentService, never()).cancel(any(), anyString());
         verify(mockOrder, never()).setStatus(OrderStatus.CANCELLED);
-
     }
 }

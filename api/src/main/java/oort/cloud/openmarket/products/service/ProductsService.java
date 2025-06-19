@@ -6,6 +6,7 @@ import oort.cloud.openmarket.category.entity.Category;
 import oort.cloud.openmarket.category.service.CategoryService;
 import oort.cloud.openmarket.common.exception.auth.UnauthorizedAccessException;
 import oort.cloud.openmarket.common.exception.business.NotFoundResourceException;
+import oort.cloud.openmarket.common.exception.business.OutOfStockException;
 import oort.cloud.openmarket.common.paging.cusor.Cursor;
 import oort.cloud.openmarket.common.paging.cusor.CursorPageRequest;
 import oort.cloud.openmarket.common.paging.cusor.CursorPageResponse;
@@ -24,7 +25,11 @@ import oort.cloud.openmarket.products.repository.ProductQueryDslRepository;
 import oort.cloud.openmarket.products.repository.ProductsRepository;
 import oort.cloud.openmarket.user.entity.Users;
 import oort.cloud.openmarket.user.service.UserService;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -137,10 +142,12 @@ public class ProductsService {
                 .orElseThrow(() -> new NotFoundResourceException("조회된 상품이 없습니다."));
     }
 
-    public List<Products> getProductListByIds(List<OrderItemCreateRequest> requests){
-        List<Long> ids = requests.stream()
-                .map(OrderItemCreateRequest::getProductId)
-                .toList();
-        return productsRepository.findAllById(ids);
+    public List<Products> getProductListByIds(List<Long> productIds){
+        List<Products> findProducts = productsRepository.findAllById(productIds);
+        if(findProducts.size() != productIds.size())
+            throw new NotFoundResourceException("조회된 상품이 없습니다.");
+        return findProducts;
     }
+
+
 }

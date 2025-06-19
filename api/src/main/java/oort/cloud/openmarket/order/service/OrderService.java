@@ -14,10 +14,12 @@ import oort.cloud.openmarket.order.repository.OrderRepository;
 import oort.cloud.openmarket.payment.service.PaymentService;
 import oort.cloud.openmarket.products.entity.Products;
 import oort.cloud.openmarket.products.service.ProductsService;
+import oort.cloud.openmarket.products.service.StockService;
 import oort.cloud.openmarket.user.entity.Address;
 import oort.cloud.openmarket.user.entity.Users;
 import oort.cloud.openmarket.user.service.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -31,12 +33,14 @@ public class OrderService {
     private final UserService userService;
     private final ProductsService productsService;
     private final PaymentService paymentService;
+    private final StockService stockService;
 
-    public OrderService(oort.cloud.openmarket.order.repository.OrderRepository orderRepository, UserService userService, ProductsService productsService, PaymentService paymentService) {
+    public OrderService(OrderRepository orderRepository, UserService userService, ProductsService productsService, PaymentService paymentService, StockService stockService) {
         this.orderRepository = orderRepository;
         this.userService = userService;
         this.productsService = productsService;
         this.paymentService = paymentService;
+        this.stockService = stockService;
     }
 
     @Transactional
@@ -48,16 +52,12 @@ public class OrderService {
         Long addressId = request.getAddressId();
         Address address = user.findAddress(addressId);
 
-        //OrderItem 생성
         List<OrderItemCreateRequest> orderItemRequests = request.getOrderItemRequests();
-        Map<Long, Products> products = productsService.getProductListByIds(orderItemRequests)
-                .stream().collect(Collectors.toMap(Products::getProductId, Function.identity()));
+        Map<Long, Products> products = getProductsMapFrom(orderItemRequests);
 
+        //OrderItem 생성
         List<OrderItem> orderItems = orderItemRequests.stream().map(req -> {
             Long productId = req.getProductId();
-            if (!products.containsKey(productId)) {
-                throw new NotFoundResourceException("조회된 상품이 없습니다.");
-            }
             return OrderItem.createOrderItem(products.get(productId), req.getQuantity());
         }).toList();
 
@@ -68,11 +68,22 @@ public class OrderService {
                 request.getReceiverName(),
                 request.getReceiverPhone(),
                 orderItems);
+
         //주문 생성
         orderRepository.save(order);
         //결제 진행
         paymentService.processPayment(order);
+
+        stockService.decreaseProductStockWithPessimisticLock(orderItemRequests);
         return new OrderCreateResponse(order.getOrderId(), order.getExternalOrderId());
+    }
+
+    private Map<Long, Products> getProductsMapFrom(List<OrderItemCreateRequest> orderItemRequests) {
+        List<Long> productIds = orderItemRequests.stream()
+                                                .map(OrderItemCreateRequest::getProductId)
+                                                .toList();
+        return productsService.getProductListByIds(productIds)
+                .stream().collect(Collectors.toMap(Products::getProductId, Function.identity()));
     }
 
     @Transactional

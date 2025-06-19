@@ -58,7 +58,8 @@ public class OrderItem {
         orderItem.totalPrice = product.getPrice() * quantity;
         orderItem.status = OrderItemStatus.ORDERED;
         orderItem.createdAt = LocalDateTime.now();
-        product.removeStock(quantity);
+//        Dead Lock 발생 위험
+//        product.removeStock(quantity);
         return orderItem;
     }
 

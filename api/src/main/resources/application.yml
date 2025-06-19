@@ -5,19 +5,22 @@ spring:
   application:
     name: openmarket
   datasource:
-    hikari:
-      initialization-fail-timeout: -1
-      connection-timeout: 60000
-    url: jdbc:mysql://openmarket-mysql-db2:3306/openmarket
-
-#    url: jdbc:mysql://localhost:13307/openmarket
+    #    url: jdbc:mysql://openmarket-mysql-db2:3306/openmarket
+    url: jdbc:mysql://localhost:13306/openmarket
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: admin@123
+    hikari:
+      initialization-fail-timeout: -1
+      connection-timeout: 30000
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      max-lifetime: 1800000
   data:
     redis:
-      host: openmarket-redis2
-#      host: 127.0.0.1
+#      host: openmarket-redis2
+      host: 127.0.0.1
       port: 6379
   jpa:
     hibernate:
