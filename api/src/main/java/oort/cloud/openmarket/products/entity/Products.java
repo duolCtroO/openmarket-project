@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import oort.cloud.openmarket.common.entity.BaseTimeEntity;
 import oort.cloud.openmarket.common.exception.business.OutOfStockException;
 import oort.cloud.openmarket.products.enums.ProductsStatus;
+import oort.cloud.openmarket.review.entity.Review;
 import oort.cloud.openmarket.user.entity.Users;
 
 import java.time.LocalDateTime;
