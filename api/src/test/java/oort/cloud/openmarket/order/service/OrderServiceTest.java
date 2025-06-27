@@ -13,7 +13,8 @@ import oort.cloud.openmarket.order.enums.OrderStatus;
 import oort.cloud.openmarket.order.repository.OrderRepository;
 import oort.cloud.openmarket.payment.service.PaymentService;
 import oort.cloud.openmarket.products.entity.Products;
-import oort.cloud.openmarket.products.service.ProductsService;
+import oort.cloud.openmarket.products.service.ProductsFinder;
+import oort.cloud.openmarket.products.service.ProductsModifyService;
 import oort.cloud.openmarket.user.entity.Address;
 import oort.cloud.openmarket.user.entity.Users;
 import oort.cloud.openmarket.user.service.UserService;
@@ -45,7 +46,7 @@ class OrderServiceTest {
     @Mock
     private UserService userService;
     @Mock
-    private ProductsService productsService;
+    private ProductsFinder productsFinder;
     @Mock
     private PaymentService paymentService;
     @InjectMocks
@@ -87,7 +88,7 @@ class OrderServiceTest {
         //when
         when(userService.findUserEntityById(1L)).thenReturn(mockUser);
         when(mockUser.findAddress(10L)).thenReturn(mockAddress);
-        when(productsService.getProductListByIds(ids)).thenReturn(List.of(product1, product2));
+        when(productsFinder.getProductListByIds(ids)).thenReturn(List.of(product1, product2));
         when(orderRepository.save(any(Order.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -117,7 +118,7 @@ class OrderServiceTest {
         //when
         when(userService.findUserEntityById(1L)).thenReturn(mockUser);
         when(mockUser.findAddress(10L)).thenReturn(mockAddress);
-        when(productsService.getProductListByIds(ids)).thenReturn(List.of(product1, product2));
+        when(productsFinder.getProductListByIds(ids)).thenReturn(List.of(product1, product2));
 
         assertThrows(OutOfStockException.class, () -> orderService.createOrder(1L, orderReq));
     }
@@ -135,7 +136,7 @@ class OrderServiceTest {
         //when
         when(userService.findUserEntityById(1L)).thenReturn(mockUser);
         when(mockUser.findAddress(10L)).thenReturn(mockAddress);
-        when(productsService.getProductListByIds(ids)).thenReturn(List.of(product1, product2));
+        when(productsFinder.getProductListByIds(ids)).thenReturn(List.of(product1, product2));
         when(orderRepository.save(any(Order.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -176,7 +177,7 @@ class OrderServiceTest {
         //when
         when(userService.findUserEntityById(1L)).thenReturn(mockUser);
         when(mockUser.findAddress(10L)).thenReturn(mockAddress);
-        when(productsService.getProductListByIds(ids)).thenReturn(List.of(product1, product2));
+        when(productsFinder.getProductListByIds(ids)).thenReturn(List.of(product1, product2));
         when(orderRepository.save(any(Order.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 

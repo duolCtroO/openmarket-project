@@ -1,19 +1,25 @@
 package oort.cloud.openmarket.review.entity;
 
+import io.jsonwebtoken.lang.Assert;
 import jakarta.persistence.*;
 import lombok.*;
 import oort.cloud.openmarket.common.entity.BaseTimeEntity;
+import oort.cloud.openmarket.common.exception.business.NotAllowedActionException;
 import oort.cloud.openmarket.order.entity.OrderItem;
 import oort.cloud.openmarket.products.entity.Products;
+import oort.cloud.openmarket.review.controller.request.UpdateReviewRequest;
 import oort.cloud.openmarket.user.entity.Users;
 
 import java.util.Objects;
 
 @Entity
-@Table(name = "review")
-@ToString
+@ToString(callSuper = true, exclude = {"user", "product", "orderItem"})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "review",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_user_orderitem", columnNames = {"user_id", "order_item_id"})
+        })
 public class Review extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +52,27 @@ public class Review extends BaseTimeEntity {
         review.content = content;
         review.isDeleted = false;
         return review;
+    }
+
+    public void updateInfo(Long userId, UpdateReviewRequest request){
+        Assert.state(!isDeleted(), "삭제된 리뷰는 수정이 불가능 합니다.");
+
+        if(this.user.getUserId().equals(userId)){
+            throw new NotAllowedActionException("리뷰 작성자만 수정이 가능합니다.");
+        }
+
+        this.rating = request.getRating();
+        this.content = request.getContent();
+    }
+
+    public void delete(Long userId){
+        Assert.state(!isDeleted(), "이미 삭제된 리뷰입니다.");
+
+        if(this.user.getUserId().equals(userId)){
+            throw new NotAllowedActionException("리뷰 작성자만 삭제가 가능합니다.");
+        }
+
+        this.isDeleted = true;
     }
 
     @Override

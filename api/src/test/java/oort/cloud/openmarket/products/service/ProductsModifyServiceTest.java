@@ -27,7 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ProductsServiceTest {
+class ProductsModifyServiceTest {
 
     @Mock
     private ProductsRepository productsRepository;
@@ -36,7 +36,7 @@ class ProductsServiceTest {
     @Mock
     private UserService userService;
     @InjectMocks
-    private ProductsService productsService;
+    private ProductsModifyService productsService;
 
     private Products product;
     private Category category;

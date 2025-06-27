@@ -13,13 +13,13 @@ import oort.cloud.openmarket.order.enums.OrderStatus;
 import oort.cloud.openmarket.order.repository.OrderRepository;
 import oort.cloud.openmarket.payment.service.PaymentService;
 import oort.cloud.openmarket.products.entity.Products;
-import oort.cloud.openmarket.products.service.ProductsService;
+import oort.cloud.openmarket.products.service.ProductsFinder;
+import oort.cloud.openmarket.products.service.ProductsModifyService;
 import oort.cloud.openmarket.products.service.StockService;
 import oort.cloud.openmarket.user.entity.Address;
 import oort.cloud.openmarket.user.entity.Users;
 import oort.cloud.openmarket.user.service.UserService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -31,14 +31,14 @@ import java.util.stream.Collectors;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final UserService userService;
-    private final ProductsService productsService;
+    private final ProductsFinder productsFinder;
     private final PaymentService paymentService;
     private final StockService stockService;
 
-    public OrderService(OrderRepository orderRepository, UserService userService, ProductsService productsService, PaymentService paymentService, StockService stockService) {
+    public OrderService(OrderRepository orderRepository, UserService userService, ProductsFinder productsFinder, PaymentService paymentService, StockService stockService) {
         this.orderRepository = orderRepository;
         this.userService = userService;
-        this.productsService = productsService;
+        this.productsFinder = productsFinder;
         this.paymentService = paymentService;
         this.stockService = stockService;
     }
@@ -82,7 +82,7 @@ public class OrderService {
         List<Long> productIds = orderItemRequests.stream()
                                                 .map(OrderItemCreateRequest::getProductId)
                                                 .toList();
-        return productsService.getProductListByIds(productIds)
+        return productsFinder.getProductListByIds(productIds)
                 .stream().collect(Collectors.toMap(Products::getProductId, Function.identity()));
     }
 
