@@ -1,5 +1,6 @@
 package oort.cloud.settlement.batch.job;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import oort.cloud.settlement.batch.chunk.processor.SettlementProcessor;
 import oort.cloud.settlement.batch.data.OrderItemDto;
@@ -36,8 +37,9 @@ import java.util.Map;
  *  3. 정산(Settlement) 테이블에 데이터 저장
  */
 
-@Configuration
 @Slf4j
+@Configuration
+@RequiredArgsConstructor
 public class JdbcSettlementJobConfig {
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
@@ -46,16 +48,6 @@ public class JdbcSettlementJobConfig {
     private final SettlementProcessor settlementProcessor;
     private final StepExecutionListener settlementStepListener;
     private final RetryListener createSettlementRetryListener;
-
-    public JdbcSettlementJobConfig(PagingQueryProvider selectOrderItemQueryProvider, JobRepository jobRepository, PlatformTransactionManager transactionManager, SettlementProcessor settlementProcessor, DataSource dataSource, StepExecutionListener settlementStepListener, RetryListener createSettlementRetryListener) {
-        this.selectOrderItemQueryProvider = selectOrderItemQueryProvider;
-        this.jobRepository = jobRepository;
-        this.transactionManager = transactionManager;
-        this.settlementProcessor = settlementProcessor;
-        this.dataSource = dataSource;
-        this.settlementStepListener = settlementStepListener;
-        this.createSettlementRetryListener = createSettlementRetryListener;
-    }
 
     @Bean
     public Job settlementJob(){

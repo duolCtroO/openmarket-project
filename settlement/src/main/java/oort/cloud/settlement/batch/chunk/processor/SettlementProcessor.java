@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @Slf4j
 @Component
 public class SettlementProcessor implements ItemProcessor<OrderItemDto, SettlementDto> {
+
     @Override
     public SettlementDto process(OrderItemDto item) throws Exception {
         log.info("SettlementProcessor 시작...");
@@ -22,7 +23,7 @@ public class SettlementProcessor implements ItemProcessor<OrderItemDto, Settleme
                                     .intValue();
         //빌더로 리펙토링 필요
         return SettlementDto.of(
-                item.getUserid(),
+                item.getUserId(),
                 item.getTotalPrice() - commissionAmount,
                 commissionAmount,
                 SettlementStatus.PENDING,

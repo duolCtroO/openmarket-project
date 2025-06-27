@@ -17,22 +17,17 @@ public class AutoConfirmOrderQueryProviderConfig {
         SqlPagingQueryProviderFactoryBean queryProviderFactoryBean = new SqlPagingQueryProviderFactoryBean();
         queryProviderFactoryBean.setDataSource(dataSource);
         queryProviderFactoryBean.setSelectClause("""
-                SELECT 
-                        oi.order_item_id
-                        ,p.user_id AS userId
-                        ,oi.total_price
-                        ,c.commission_rate AS commissionRate
-                        ,oi.confirmed_at
+                SELECT  order_item_id,
+                        status,
+                        delivered_at
                 """);
         queryProviderFactoryBean.setFromClause(
                 """
-                FROM order_item oi INNER JOIN product_categories pc ON oi.product_id = pc.product_id
-                                   INNER JOIN categories c ON pc.category_id  = c.category_id
-                                   INNER JOIN products p ON oi.product_id = p.product_id
+                FROM order_item
                 """);
         queryProviderFactoryBean.setWhereClause("""
-                WHERE oi.status = :status
-                AND oi.confirmed_at = :confirmedAt
+                WHERE status = :status
+                AND delivered_at <= :targetDate
                 """);
         queryProviderFactoryBean.setSortKeys(Map.of("order_item_id", Order.ASCENDING));
         return queryProviderFactoryBean.getObject();

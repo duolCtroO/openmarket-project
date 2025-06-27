@@ -1,10 +1,12 @@
 package oort.cloud.settlement.batch.data;
 
+import lombok.Getter;
 import oort.cloud.settlement.batch.data.enums.SettlementStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Getter
 public class SettlementDto {
     private Long orderItemId;
     private Long userId;
@@ -28,57 +30,5 @@ public class SettlementDto {
         settlement.status = status;
         settlement.createdAt = LocalDateTime.now();
         return settlement;
-    }
-
-    public void setSettlementAmount(int settlementAmount) {
-        this.settlementAmount = settlementAmount;
-    }
-
-    public void setScheduledAt(LocalDate scheduledAt) {
-        this.scheduledAt = scheduledAt;
-    }
-
-    public void setPaidAt(LocalDate paidAt) {
-        this.paidAt = paidAt;
-    }
-
-    public void setStatus(SettlementStatus status) {
-        this.status = status;
-    }
-
-    public void setCommissionAmount(int commissionAmount) {
-        this.commissionAmount = commissionAmount;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public Long getOrderItemId() {
-        return orderItemId;
-    }
-
-    public int getSettlementAmount() {
-        return settlementAmount;
-    }
-
-    public LocalDate getScheduledAt() {
-        return scheduledAt;
-    }
-
-    public LocalDate getPaidAt() {
-        return paidAt;
-    }
-
-    public String getStatus() {
-        return status.name();
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public int getCommissionAmount() {
-        return commissionAmount;
     }
 }

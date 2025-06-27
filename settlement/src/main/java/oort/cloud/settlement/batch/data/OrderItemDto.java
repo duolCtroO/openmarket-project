@@ -1,63 +1,29 @@
 package oort.cloud.settlement.batch.data;
 
-import oort.cloud.openmarket.enums.OrderItemStatus;
+import lombok.Getter;
+import lombok.Setter;
+import oort.cloud.settlement.batch.data.enums.OrderItemStatus;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
+@Getter
+@Setter
 public class OrderItemDto {
     private Long orderItemId;
     private Long userId;
     private Integer totalPrice;
     private OrderItemStatus status;
     private BigDecimal commissionRate;
-    private Date confirmedAt;
-    public void setUserid(Long userid) {
-        this.userId = userid;
-    }
+    private LocalDate confirmedAt;
+    private LocalDate deliveryAt;
 
-    public void setOrderItemId(Long orderItemId) {
-        this.orderItemId = orderItemId;
-    }
-
-    public void setTotalPrice(Integer totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public void setCommissionRate(BigDecimal commissionRate) {
-        this.commissionRate = commissionRate;
-    }
-
-    public void setConfirmedAt(Date confirmedAt) {
-        this.confirmedAt = confirmedAt;
-    }
-
-    public void setStatus(OrderItemStatus status) {
+    public void changeStatus(OrderItemStatus status){
         this.status = status;
     }
 
-    public Long getOrderItemId() {
-        return orderItemId;
-    }
-
-    public Long getUserid() {
-        return userId;
-    }
-
-    public Integer getTotalPrice() {
-        return totalPrice;
-    }
-
-    public BigDecimal getCommissionRate() {
-        return commissionRate;
-    }
-
-    public Date getConfirmedAt() {
-        return confirmedAt;
-    }
-
-    public OrderItemStatus getStatus() {
-        return status;
+    public void setConfirmedAt(LocalDate confirmedAt) {
+        this.confirmedAt = confirmedAt;
     }
 
     @Override
@@ -66,8 +32,10 @@ public class OrderItemDto {
                 "orderItemId=" + orderItemId +
                 ", userId=" + userId +
                 ", totalPrice=" + totalPrice +
+                ", status=" + status +
                 ", commissionRate=" + commissionRate +
                 ", confirmedAt=" + confirmedAt +
+                ", deliveryAt=" + deliveryAt +
                 '}';
     }
 }

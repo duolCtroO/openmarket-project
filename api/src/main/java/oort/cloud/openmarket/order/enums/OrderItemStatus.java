@@ -7,7 +7,8 @@ public enum OrderItemStatus {
     SHIPPED,     // 배송중
     DELIVERED,   // 배송완료
     CANCELLED,   // 주문 취소
-    RETURNED     // 반품
+    RETURNED,     // 반품
+    CONFIRMED,    // 구매 완료
     ;
 
     private static final EnumSet<OrderItemStatus> CANCELLABLE_STATUSES =
