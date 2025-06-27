@@ -25,17 +25,10 @@ public class AuthService {
         return userService.save(request);
     }
 
-    public UserDto login(LoginRequest loginRequest){
+    public Users login(LoginRequest loginRequest){
         Users user = userService.findUserByEmail(loginRequest.getEmail());
         validateUser(loginRequest, user);
-        return UserDto.of(
-                user.getUserId(),
-                user.getEmail(),
-                user.getUserName(),
-                user.getPhone(),
-                user.getUserRole(),
-                user.getUserStatus()
-        );
+        return user;
     }
 
     private void validateUser(LoginRequest loginRequest, Users user) {

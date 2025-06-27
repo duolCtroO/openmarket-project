@@ -88,12 +88,12 @@ class AuthServiceTest {
         //when
         when(userService.findUserByEmail(request.getEmail())).thenReturn(user);
         when(encoder.matches(request.getPassword(), user.getPassword())).thenReturn(true);
-        when(jwtManager.createAuthToken(any(UserDto.class))).thenReturn(mockToken);
+        when(jwtManager.createAuthToken(any(Users.class))).thenReturn(mockToken);
 
-        UserDto userDto = authService.login(request);
+        Users loginUser = authService.login(request);
 
         //then
-        assertEquals(userDto.getUserId(), user.getUserId());
+        assertEquals(user.getUserId(), loginUser.getUserId());
     }
 
     private LoginRequest getLoginRequest() {

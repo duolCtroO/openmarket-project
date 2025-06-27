@@ -12,6 +12,7 @@ import oort.cloud.openmarket.auth.service.TokenRedisService;
 import oort.cloud.openmarket.auth.service.TokenService;
 import oort.cloud.openmarket.auth.utils.TokenCookieHelper;
 import oort.cloud.openmarket.user.data.UserDto;
+import oort.cloud.openmarket.user.entity.Users;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,7 +45,7 @@ public class AuthController {
     @PostMapping("/v1/auth/login")
     public ResponseEntity<AuthToken> loginByDatabase(@RequestBody @Valid LoginRequest loginRequest
             , HttpServletResponse response){
-        UserDto user = authService.login(loginRequest);
+        Users user = authService.login(loginRequest);
         AuthToken authToken = tokenDataBaseService.createAuthToken(user);
         tokenCookieHelper.addRefreshTokenCookie(response, authToken.getRefreshToken());
         return ResponseEntity
@@ -74,11 +75,9 @@ public class AuthController {
 
 
     @PostMapping("/v2/auth/login")
-    public ResponseEntity<AuthToken> loginByRedis(@RequestBody @Valid LoginRequest loginRequest
-    , HttpServletResponse response){
-        UserDto user = authService.login(loginRequest);
+    public ResponseEntity<AuthToken> loginByRedis(@RequestBody @Valid LoginRequest loginRequest){
+        Users user = authService.login(loginRequest);
         AuthToken authToken = tokenRedisService.createAuthToken(user);
-        tokenCookieHelper.addRefreshTokenCookie(response, authToken.getRefreshToken());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(authToken);

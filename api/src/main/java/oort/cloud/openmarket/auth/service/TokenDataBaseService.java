@@ -11,6 +11,7 @@ import oort.cloud.openmarket.common.exception.auth.InvalidTokenException;
 import oort.cloud.openmarket.common.exception.auth.UnauthorizedAccessException;
 import oort.cloud.openmarket.common.exception.enums.ErrorType;
 import oort.cloud.openmarket.user.data.UserDto;
+import oort.cloud.openmarket.user.entity.Users;
 import oort.cloud.openmarket.user.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +45,7 @@ public class TokenDataBaseService implements TokenService {
         if(savedToken.getExpiredAt().isBefore(LocalDateTime.now()))
             throw new ExpiredTokenException(ErrorType.EXPIRED_TOKEN);
 
-        UserDto user = userService.findUserById(savedToken.getUserId());
+        Users user = userService.findUserById(savedToken.getUserId());
         return jwtManager.getAccessToken(
                 user,
                 Duration.ofMinutes(properties.accessTokenExpiredMinutes())
@@ -53,7 +54,7 @@ public class TokenDataBaseService implements TokenService {
 
     @Override
     @Transactional
-    public AuthToken createAuthToken(UserDto user) {
+    public AuthToken createAuthToken(Users user) {
         Duration refreshDuration = Duration.ofDays(properties.refreshTokenExpiredDay());
         Duration accessDuration = Duration.ofMinutes(properties.accessTokenExpiredMinutes());
 

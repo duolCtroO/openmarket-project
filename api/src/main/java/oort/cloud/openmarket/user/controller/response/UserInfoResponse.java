@@ -1,6 +1,6 @@
 package oort.cloud.openmarket.user.controller.response;
 
-import oort.cloud.openmarket.user.data.UserDto;
+import oort.cloud.openmarket.user.entity.Users;
 import oort.cloud.openmarket.user.enums.UserRole;
 
 public class UserInfoResponse {
@@ -18,12 +18,12 @@ public class UserInfoResponse {
         return userInfoResponse;
     }
 
-    public static UserInfoResponse from(UserDto userDto){
+    public static UserInfoResponse of(Users user){
         return UserInfoResponse.of(
-                userDto.getEmail(),
-                userDto.getUserName(),
-                userDto.getPhone(),
-                userDto.getUserRole()
+                user.getEmail(),
+                user.getUserName(),
+                user.getPhone(),
+                user.getUserRole()
         );
     }
 

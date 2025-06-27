@@ -69,9 +69,8 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public UserDto findUserById(Long userId){
+    public Users findUserById(Long userId){
         return userRepository.findById(userId)
-                .map(UserDto::from)
                 .orElseThrow(() -> new NotFoundResourceException("조회된 유저 정보가 없습니다."));
     }
 

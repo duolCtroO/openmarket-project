@@ -9,6 +9,7 @@ import oort.cloud.openmarket.common.exception.auth.ExpiredTokenException;
 import oort.cloud.openmarket.common.exception.auth.InvalidTokenException;
 import oort.cloud.openmarket.common.exception.enums.ErrorType;
 import oort.cloud.openmarket.user.data.UserDto;
+import oort.cloud.openmarket.user.entity.Users;
 import oort.cloud.openmarket.user.enums.UserRole;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +33,7 @@ public class JwtManager {
         this.clock = clock;
     }
 
-    public String getRefreshToken(UserDto user, Duration duration) {
+    public String getRefreshToken(Users user, Duration duration) {
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .signWith(this.secretKey)
@@ -41,7 +42,7 @@ public class JwtManager {
                 .compact();
     }
 
-    public String getAccessToken(UserDto user, Duration duration) {
+    public String getAccessToken(Users user, Duration duration) {
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .signWith(this.secretKey)
@@ -51,7 +52,7 @@ public class JwtManager {
                 .compact();
     }
 
-    public AuthToken createAuthToken(UserDto user) {
+    public AuthToken createAuthToken(Users user) {
         Duration refreshDuration = Duration.ofDays(properties.refreshTokenExpiredDay());
         Duration accessDuration = Duration.ofMinutes(properties.accessTokenExpiredMinutes());
         return AuthToken.of(
@@ -92,12 +93,11 @@ public class JwtManager {
     }
 
     private Claims getClaims(String token) {
-        Claims claims = Jwts.parserBuilder()
+        return Jwts.parserBuilder()
                 .setSigningKey(this.secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return claims;
     }
 
     private Date getExpireDate(Duration duration) {

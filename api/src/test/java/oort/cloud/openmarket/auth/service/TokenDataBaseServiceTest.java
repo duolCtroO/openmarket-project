@@ -9,7 +9,9 @@ import oort.cloud.openmarket.auth.utils.jwt.JwtProperties;
 import oort.cloud.openmarket.common.exception.auth.ExpiredTokenException;
 import oort.cloud.openmarket.common.exception.auth.InvalidTokenException;
 import oort.cloud.openmarket.common.exception.auth.UnauthorizedAccessException;
+import oort.cloud.openmarket.user.UserFixture;
 import oort.cloud.openmarket.user.data.UserDto;
+import oort.cloud.openmarket.user.entity.Users;
 import oort.cloud.openmarket.user.enums.UserRole;
 import oort.cloud.openmarket.user.enums.UserStatus;
 import oort.cloud.openmarket.user.service.UserService;
@@ -48,7 +50,7 @@ class TokenDataBaseServiceTest {
     @Test
     @DisplayName("AccessToken과 RefreshToken을 포함한 AuthToken을 반환하며 RefreshToken은 토큰 테이블 저장된다.")
     void create_authToken() {
-        UserDto user = UserDto.of(1L, "email@test.com", "tester", "01012345678", UserRole.BUYER, UserStatus.ACTIVE);
+        Users user = UserFixture.getUser();
 
         when(jwtProperties.accessTokenExpiredMinutes()).thenReturn(30);
         when(jwtProperties.refreshTokenExpiredDay()).thenReturn(7);
@@ -75,7 +77,7 @@ class TokenDataBaseServiceTest {
 
         when(jwtManager.getRefreshTokenPayload(tokenValue)).thenReturn(payload);
         when(refreshTokenRepository.findByUserId(anyLong())).thenReturn(Optional.of(token));
-        when(userService.findUserById(userId)).thenReturn(UserDto.of(userId, "email", "name", "010", UserRole.BUYER, UserStatus.ACTIVE));
+        when(userService.findUserById(userId)).thenReturn(UserFixture.getUser());
         when(jwtManager.getAccessToken(any(), any())).thenReturn("new-access-token");
 
         String result = tokenService.refreshAccessToken(tokenValue);
@@ -126,7 +128,7 @@ class TokenDataBaseServiceTest {
     @DisplayName("기존 토근이 없을 경우 토큰을 DB에 저장한다")
     void create_authToken_insert(){
         //given
-        UserDto user = UserDto.of(1L, "test@email.com", "test", "010", UserRole.BUYER, UserStatus.ACTIVE);
+        Users user = UserFixture.getUser();
         when(jwtProperties.accessTokenExpiredMinutes()).thenReturn(30);
         when(jwtProperties.refreshTokenExpiredDay()).thenReturn(7);
         when(jwtManager.getAccessToken(eq(user), any())).thenReturn("access_token");
@@ -145,7 +147,7 @@ class TokenDataBaseServiceTest {
     @DisplayName("기존 토근이 있는 경우 토큰을 DB에 갱신한다")
     void create_authToken_update(){
         //given
-        UserDto user = UserDto.of(1L, "test@email.com", "test", "010", UserRole.BUYER, UserStatus.ACTIVE);
+        Users user = UserFixture.getUser();
         RefreshToken oldToken = RefreshToken.createRefreshToken(user.getUserId(), "old-token", LocalDateTime.now().plusDays(7));
 
         when(jwtProperties.accessTokenExpiredMinutes()).thenReturn(30);

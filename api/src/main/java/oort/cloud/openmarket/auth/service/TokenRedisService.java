@@ -9,6 +9,7 @@ import oort.cloud.openmarket.common.exception.auth.InvalidTokenException;
 import oort.cloud.openmarket.common.exception.auth.UnauthorizedAccessException;
 import oort.cloud.openmarket.common.exception.enums.ErrorType;
 import oort.cloud.openmarket.user.data.UserDto;
+import oort.cloud.openmarket.user.entity.Users;
 import oort.cloud.openmarket.user.service.UserService;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class TokenRedisService implements TokenService{
         if(!savedToken.equals(refreshToken))
             throw new InvalidTokenException(ErrorType.INVALID_TOKEN);
 
-        UserDto user = userService.findUserById(userId);
+        Users user = userService.findUserById(userId);
         return jwtManager.getAccessToken(
                 user,
                 Duration.ofMinutes(properties.accessTokenExpiredMinutes())
@@ -48,7 +49,7 @@ public class TokenRedisService implements TokenService{
     }
 
     @Override
-    public AuthToken createAuthToken(UserDto user) {
+    public AuthToken createAuthToken(Users user) {
         Duration refreshDuration = Duration.ofDays(properties.refreshTokenExpiredDay());
         Duration accessDuration = Duration.ofMinutes(properties.accessTokenExpiredMinutes());
 
@@ -60,7 +61,7 @@ public class TokenRedisService implements TokenService{
         return AuthToken.of(accessToken, refreshToken);
     }
 
-    private String getOrCreateRefreshToken(UserDto user, Duration refreshDuration) {
+    private String getOrCreateRefreshToken(Users user, Duration refreshDuration) {
         return refreshTokenRedisRepository.read(user.getUserId())
                 .orElseGet(() -> jwtManager.getRefreshToken(user, refreshDuration));
     }

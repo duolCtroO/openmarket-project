@@ -10,7 +10,9 @@ import oort.cloud.openmarket.auth.utils.jwt.JwtManager;
 import oort.cloud.openmarket.auth.utils.jwt.JwtProperties;
 import oort.cloud.openmarket.common.exception.auth.InvalidTokenException;
 import oort.cloud.openmarket.common.exception.enums.ErrorType;
+import oort.cloud.openmarket.user.UserFixture;
 import oort.cloud.openmarket.user.data.UserDto;
+import oort.cloud.openmarket.user.entity.Users;
 import oort.cloud.openmarket.user.enums.UserRole;
 import oort.cloud.openmarket.user.enums.UserStatus;
 import org.junit.jupiter.api.Assertions;
@@ -50,22 +52,22 @@ class JwtManagerTest {
     @DisplayName("JWT Access 토큰 생성이 성공한다.")
     void success_create_jwt(){
         //given
-        UserDto userDto = getUserDto();
+        Users user = UserFixture.getUser();
 
         //when
-        AuthToken authToken = jwtManager.createAuthToken(userDto);
+        AuthToken authToken = jwtManager.createAuthToken(user);
         String accessToken = authToken.getAccessToken();
         AccessTokenPayload parseUserPayload = jwtManager.getAccessTokenPayload(accessToken);
 
         //then
-        assertEquals(parseUserPayload.getUserId(), userDto.getUserId());
+        assertEquals(parseUserPayload.getUserId(), user.getUserId());
     }
 
     @Test
     @DisplayName("JWT 토큰 검증이 실패할 경우 InvalidTokenException 타입의 예외를 던진다.")
     void fail_validate_token(){
         //given
-        UserDto user = getUserDto();
+        Users user = UserFixture.getUser();
 
         //when
         AuthToken authToken = jwtManager.createAuthToken(user);
@@ -78,17 +80,12 @@ class JwtManagerTest {
         assertEquals(message, ErrorType.INVALID_TOKEN.getMessage());
     }
 
-    private UserDto getUserDto() {
-        UserDto user = UserDto.of(1L, "test@email.com", "test",
-                "12312341234", UserRole.BUYER, UserStatus.ACTIVE);
-        return user;
-    }
 
     @Test
     @DisplayName("Access Token의 만료 시간이 정확히 30분 뒤인지 확인")
     void accessToken_expiration_is_valid() {
-        UserDto userDto = getUserDto();
-        String accessToken = jwtManager.createAuthToken(userDto).getAccessToken();
+        Users user = UserFixture.getUser();
+        String accessToken = jwtManager.createAuthToken(user).getAccessToken();
 
         Claims claims = extractClaims(accessToken);
         Date expiration = claims.getExpiration();
@@ -104,8 +101,8 @@ class JwtManagerTest {
     @Test
     @DisplayName("Refresh Token의 만료시간이 정확히 7일 이후")
     void refreshToken_has_longer_expiration() {
-        UserDto userDto = getUserDto();
-        AuthToken token = jwtManager.createAuthToken(userDto);
+        Users user = UserFixture.getUser();
+        AuthToken token = jwtManager.createAuthToken(user);
 
         Claims refreshClaims = extractClaims(token.getRefreshToken());
         Date expiration = refreshClaims.getExpiration();
@@ -120,11 +117,11 @@ class JwtManagerTest {
     @Test
     @DisplayName("Access Token의 User 정보 파싱이 성공한다.")
     void access_token_userInfo() {
-        UserDto userDto = getUserDto();
-        AuthToken token = jwtManager.createAuthToken(userDto);
+        Users user = UserFixture.getUser();
+        AuthToken token = jwtManager.createAuthToken(user);
         AccessTokenPayload extractUser = jwtManager.getAccessTokenPayload(token.getAccessToken());
 
-        assertEquals(userDto.getUserId(), extractUser.getUserId());
+        assertEquals(user.getUserId(), extractUser.getUserId());
     }
 
     private Claims extractClaims(String token) {

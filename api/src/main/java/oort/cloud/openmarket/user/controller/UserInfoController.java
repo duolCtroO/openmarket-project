@@ -4,7 +4,7 @@ import oort.cloud.openmarket.auth.data.AccessTokenPayload;
 import oort.cloud.openmarket.auth.annotations.AccessToken;
 import oort.cloud.openmarket.user.controller.request.AddressCreateRequest;
 import oort.cloud.openmarket.user.controller.response.UserInfoResponse;
-import oort.cloud.openmarket.user.data.UserDto;
+import oort.cloud.openmarket.user.entity.Users;
 import oort.cloud.openmarket.user.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,9 +25,9 @@ public class UserInfoController {
      */
     @GetMapping("/v1/user/me")
     public ResponseEntity<UserInfoResponse> getMyInfo(@AccessToken AccessTokenPayload user){
-        UserDto userDto = userService.findUserById(user.getUserId());
+        Users userDto = userService.findUserById(user.getUserId());
         return ResponseEntity.ok()
-                .body(UserInfoResponse.from(userDto));
+                .body(UserInfoResponse.of(userDto));
     }
 
     @PostMapping ("/v1/user/address")
