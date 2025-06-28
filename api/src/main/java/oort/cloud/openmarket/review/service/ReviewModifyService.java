@@ -1,6 +1,7 @@
 package oort.cloud.openmarket.review.service;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import oort.cloud.openmarket.common.exception.business.NotAllowedActionException;
 import oort.cloud.openmarket.order.entity.OrderItem;
 import oort.cloud.openmarket.order.enums.OrderItemStatus;
@@ -16,18 +17,13 @@ import oort.cloud.openmarket.user.service.UserService;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class ReviewModifyService implements ReviewRegister{
     private final ReviewRepository reviewRepository;
     private final ReviewFinder reviewFinder;
     private final UserService userService;
     private final OrderItemService orderItemService;
-
-    public ReviewModifyService(ReviewRepository reviewRepository, ReviewFinder reviewFinder, UserService userService, OrderItemService orderItemService) {
-        this.reviewRepository = reviewRepository;
-        this.reviewFinder = reviewFinder;
-        this.userService = userService;
-        this.orderItemService = orderItemService;
-    }
+    private final ReviewCountService reviewCountService;
 
     @Transactional
     @Override
@@ -41,6 +37,8 @@ public class ReviewModifyService implements ReviewRegister{
         isWritable(orderItem, user);
 
         Products product = orderItem.getProduct();
+
+        reviewCountService.increaseCount(product, request);
 
         return ReviewResponse.of(
                 reviewRepository.save(
@@ -62,7 +60,7 @@ public class ReviewModifyService implements ReviewRegister{
     }
 
     private void isWritable(OrderItem orderItem, Users user) {
-        if(orderItem.getStatus() != OrderItemStatus.COMPLETED){
+        if(orderItem.getStatus() != OrderItemStatus.CONFIRMED){
             throw new NotAllowedActionException("구매확정된 상품 대상으로 리뷰 작성이 가능합니다.");
         }
 
@@ -77,6 +75,10 @@ public class ReviewModifyService implements ReviewRegister{
         Review review = reviewFinder.findById(reviewId);
 
         review.updateInfo(userId, updateReviewRequest);
+
+        if(review.getRating() != updateReviewRequest.getRating()){
+            reviewCountService.updateRating(review, updateReviewRequest.getRating());
+        }
 
         return ReviewResponse.of(reviewRepository.save(review));
     }
